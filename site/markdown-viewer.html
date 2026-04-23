@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document Viewer | Jason Feimster Personal Brand OS</title>
+  <meta name="description" content="Styled markdown document viewer for docs and prompt files in jf-brand-os." />
+  <link rel="stylesheet" href="../assets/css/style.css" />
+  <style>
+    .doc-viewer-shell {
+      width: min(1100px, calc(100% - 2rem));
+      margin: 0 auto;
+      padding: 2rem 0 3rem;
+    }
+
+    .doc-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-bottom: 1rem;
+    }
+
+    .doc-breadcrumb {
+      display: flex;
+      gap: 0.45rem;
+      flex-wrap: wrap;
+      color: var(--muted);
+      font-size: 0.9rem;
+    }
+
+    .doc-breadcrumb a {
+      color: var(--link);
+    }
+
+    .doc-article {
+      border: 1px solid var(--border);
+      border-radius: var(--radius-xl);
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.028), rgba(255,255,255,0.012)),
+        var(--panel);
+      box-shadow: var(--shadow-lg);
+      padding: 1.5rem;
+    }
+
+    .doc-meta {
+      margin-bottom: 1rem;
+      color: var(--muted);
+      font-size: 0.88rem;
+    }
+
+    .markdown-body {
+      color: var(--text);
+      line-height: 1.75;
+    }
+
+    .markdown-body h1,
+    .markdown-body h2,
+    .markdown-body h3,
+    .markdown-body h4,
+    .markdown-body h5,
+    .markdown-body h6 {
+      margin-top: 1.6em;
+      margin-bottom: 0.65em;
+      color: var(--heading);
+      scroll-margin-top: 110px;
+    }
+
+    .markdown-body h1 { font-size: 2.3rem; }
+    .markdown-body h2 { font-size: 1.6rem; }
+    .markdown-body h3 { font-size: 1.2rem; }
+
+    .markdown-body p,
+    .markdown-body li {
+      color: var(--text-soft);
+    }
+
+    .markdown-body ul,
+    .markdown-body ol {
+      padding-left: 1.4rem;
+    }
+
+    .markdown-body hr {
+      border: 0;
+      border-top: 1px solid var(--border);
+      margin: 1.5rem 0;
+    }
+
+    .markdown-body blockquote {
+      margin: 1rem 0;
+      padding: 0.9rem 1rem;
+      border-left: 3px solid var(--accent-strong);
+      background: rgba(255,255,255,0.02);
+      color: var(--text-soft);
+    }
+
+    .markdown-body code {
+      font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+      font-size: 0.92em;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(148, 163, 184, 0.14);
+      border-radius: 8px;
+      padding: 0.15rem 0.35rem;
+      color: var(--heading);
+    }
+
+    .markdown-body pre {
+      overflow: auto;
+      padding: 1rem;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: rgba(7, 14, 24, 0.92);
+      box-shadow: var(--shadow-sm);
+    }
+
+    .markdown-body pre code {
+      background: transparent;
+      border: 0;
+      padding: 0;
+    }
+
+    .markdown-body table {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 1rem 0;
+    }
+
+    .markdown-body th,
+    .markdown-body td {
+      border: 1px solid var(--border);
+      padding: 0.75rem;
+      text-align: left;
+      color: var(--text-soft);
+    }
+
+    .doc-empty {
+      padding: 1.25rem;
+      border-radius: 16px;
+      border: 1px dashed var(--border-strong);
+      color: var(--text-soft);
+      background: rgba(255,255,255,0.02);
+    }
+  </style>
+</head>
+<body class="docs-page">
+  <header class="docs-topbar">
+    <div class="docs-topbar-inner">
+      <a class="docs-brand" href="/" aria-label="Jason Feimster Personal Brand OS home">
+        <span class="docs-brand-mark">JF</span>
+        <span class="docs-brand-copy">
+          <strong>Personal Brand OS</strong>
+          <small>Document viewer</small>
+        </span>
+      </a>
+      <div class="docs-top-actions">
+        <a class="ghost-link" href="/docs">Docs center</a>
+        <a class="ghost-link" id="openGitHubDoc" href="https://github.com/JFeimster/jf-brand-os" target="_blank" rel="noreferrer">Open on GitHub</a>
+      </div>
+    </div>
+  </header>
+
+  <main class="doc-viewer-shell">
+    <div class="doc-toolbar">
+      <nav class="doc-breadcrumb" id="breadcrumb"></nav>
+      <div class="button-row" style="margin-top:0;">
+        <a class="button" id="backToCategory" href="/docs">Back to docs</a>
+      </div>
+    </div>
+
+    <article class="doc-article">
+      <div class="doc-meta" id="docMeta">Loading document…</div>
+      <div class="markdown-body" id="docContent"></div>
+    </article>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/dompurify@3.1.6/dist/purify.min.js"></script>
+  <script>
+    (function () {
+      const pathname = window.location.pathname;
+      const normalizedPath = pathname.replace(/^\/+/, '');
+      const rawUrl = 'https://raw.githubusercontent.com/JFeimster/jf-brand-os/main/' + normalizedPath;
+
+      const breadcrumb = document.getElementById('breadcrumb');
+      const docMeta = document.getElementById('docMeta');
+      const docContent = document.getElementById('docContent');
+      const openGitHubDoc = document.getElementById('openGitHubDoc');
+      const backToCategory = document.getElementById('backToCategory');
+
+      openGitHubDoc.href = 'https://github.com/JFeimster/jf-brand-os/blob/main/' + normalizedPath;
+
+      function guessCategory(path) {
+        if (path.startsWith('docs/brand-bio/')) return { href: '/brand-bio', label: 'Brand Bio' };
+        if (path.startsWith('docs/resume/')) return { href: '/resume', label: 'Resume' };
+        if (path.startsWith('docs/media-kit/')) return { href: '/media-kit', label: 'Media Kit' };
+        if (path.startsWith('prompts/')) return { href: '/prompts', label: 'Prompts' };
+        return { href: '/docs', label: 'Docs Center' };
+      }
+
+      const category = guessCategory(normalizedPath);
+      backToCategory.href = category.href;
+      backToCategory.textContent = 'Back to ' + category.label;
+
+      const crumbs = [
+        { href: '/', label: 'Home' },
+        { href: '/docs', label: 'Docs' }
+      ];
+
+      if (category.href !== '/docs') crumbs.push(category);
+      crumbs.push({ href: pathname, label: normalizedPath.split('/').pop() || 'Document' });
+
+      breadcrumb.innerHTML = crumbs.map((crumb, index) => {
+        const sep = index < crumbs.length - 1 ? '<span>/</span>' : '';
+        return '<a href="' + crumb.href + '">' + crumb.label + '</a>' + sep;
+      }).join(' ');
+
+      docMeta.textContent = normalizedPath;
+
+      fetch(rawUrl)
+        .then((response) => {
+          if (!response.ok) throw new Error('Failed to load document');
+          return response.text();
+        })
+        .then((markdown) => {
+          document.title = (normalizedPath.split('/').pop() || 'Document') + ' | Jason Feimster Personal Brand OS';
+          const html = marked.parse(markdown, {
+            breaks: true,
+            gfm: true,
+            headerIds: true,
+            mangle: false
+          });
+          docContent.innerHTML = DOMPurify.sanitize(html);
+        })
+        .catch(() => {
+          docMeta.textContent = 'Unable to load document';
+          docContent.innerHTML = '<div class="doc-empty">This file could not be rendered as a styled page right now. Use the GitHub button above to open the source file directly.</div>';
+        });
+    })();
+  </script>
+</body>
+</html>
