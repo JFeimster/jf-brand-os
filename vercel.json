@@ -31,6 +31,9 @@
     { "source": "/prompts.html", "destination": "/site/prompts.html" },
 
     { "source": "/404", "destination": "/site/404.html" },
-    { "source": "/404.html", "destination": "/site/404.html" }
+    { "source": "/404.html", "destination": "/site/404.html" },
+
+    { "source": "/docs/(.*)", "destination": "/site/markdown-viewer.html" },
+    { "source": "/prompts/(.*)", "destination": "/site/markdown-viewer.html" }
   ]
 }
