@@ -1,0 +1,36 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "rewrites": [
+    { "source": "/", "destination": "/site/index.html" },
+
+    { "source": "/about", "destination": "/site/about.html" },
+    { "source": "/about.html", "destination": "/site/about.html" },
+
+    { "source": "/services", "destination": "/site/services.html" },
+    { "source": "/services.html", "destination": "/site/services.html" },
+
+    { "source": "/portfolio", "destination": "/site/portfolio.html" },
+    { "source": "/portfolio.html", "destination": "/site/portfolio.html" },
+
+    { "source": "/contact", "destination": "/site/contact.html" },
+    { "source": "/contact.html", "destination": "/site/contact.html" },
+
+    { "source": "/docs", "destination": "/site/docs.html" },
+    { "source": "/docs.html", "destination": "/site/docs.html" },
+
+    { "source": "/brand-bio", "destination": "/site/brand-bio.html" },
+    { "source": "/brand-bio.html", "destination": "/site/brand-bio.html" },
+
+    { "source": "/resume", "destination": "/site/resume.html" },
+    { "source": "/resume.html", "destination": "/site/resume.html" },
+
+    { "source": "/media-kit", "destination": "/site/media-kit.html" },
+    { "source": "/media-kit.html", "destination": "/site/media-kit.html" },
+
+    { "source": "/prompts", "destination": "/site/prompts.html" },
+    { "source": "/prompts.html", "destination": "/site/prompts.html" },
+
+    { "source": "/404", "destination": "/site/404.html" },
+    { "source": "/404.html", "destination": "/site/404.html" }
+  ]
+}
